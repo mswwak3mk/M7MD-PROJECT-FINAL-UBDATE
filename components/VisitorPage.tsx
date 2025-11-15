@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { PortfolioData } from '../types';
 import AnimatedBackground from './AnimatedBackground';
 import Card from './Card';
@@ -22,13 +22,20 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
 const VisitorPage: React.FC<VisitorPageProps> = ({ data }) => {
   const { profile, achievements, skills, favoriteSubjects, teacherFeedback } = data;
 
+  useEffect(() => {
+    const element = document.getElementById('hero-section');
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
   return (
     <main className="relative isolate overflow-hidden">
         <AnimatedBackground />
         <div className="relative z-10 p-4 md:p-8 max-w-5xl mx-auto">
             
             {/* Hero Section */}
-            <header className="text-center py-20">
+            <header id="hero-section" className="text-center py-20">
                 <div className="inline-block p-4 border-2 border-purple-500 rounded-full shadow-lg shadow-purple-500/50 mb-6">
                     <img src={profile.imageUrl} alt="الصورة الشخصية" className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover" />
                 </div>
