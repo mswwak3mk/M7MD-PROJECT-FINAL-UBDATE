@@ -7,11 +7,20 @@ const FOOD_START = [8, 3];
 const SCALE = 20;
 const SPEED = 150;
 
+const UP = [0, -1];
+const DOWN = [0, 1];
+const LEFT = [-1, 0];
+const RIGHT = [1, 0];
+
 const DIRECTIONS: { [key: string]: number[] } = {
-  ArrowUp: [0, -1],
-  ArrowDown: [0, 1],
-  ArrowLeft: [-1, 0],
-  ArrowRight: [1, 0],
+  arrowup: UP,
+  w: UP,
+  arrowdown: DOWN,
+  s: DOWN,
+  arrowleft: LEFT,
+  a: LEFT,
+  arrowright: RIGHT,
+  d: RIGHT,
 };
 
 const SnakeGame: React.FC = () => {
@@ -44,7 +53,8 @@ const SnakeGame: React.FC = () => {
     };
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent | KeyboardEvent) => {
-        const newDirection = DIRECTIONS[e.key];
+        const key = e.key.toLowerCase();
+        const newDirection = DIRECTIONS[key];
         if (newDirection) {
             e.preventDefault();
             setDirection(currentDirection => {
@@ -62,7 +72,8 @@ const SnakeGame: React.FC = () => {
         containerRef.current?.focus();
         
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
-             if (Object.keys(DIRECTIONS).includes(e.key)) {
+             const key = e.key.toLowerCase();
+             if (key in DIRECTIONS) {
                 handleKeyDown(e);
              }
         };

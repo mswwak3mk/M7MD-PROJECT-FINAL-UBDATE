@@ -6,6 +6,7 @@ import NeonButton from './Button';
 import { GamepadIcon, UserIcon, TrophyIcon, BrainCircuitIcon, TeacherIcon, CircuitBoardIcon, ControllerIcon, HelpCircleIcon } from './icons';
 import SnakeGame from './SnakeGame';
 import QuizGame from './QuizGame';
+import MemoryGame from './MemoryGame';
 
 interface VisitorPageProps {
   data: PortfolioData;
@@ -24,6 +25,7 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
 const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback }) => {
   const { profile, achievements, skills, favoriteSubjects, teacherFeedback } = data;
   const [newFeedback, setNewFeedback] = useState({ teacherName: '', comment: '' });
+  const [showMemoryGame, setShowMemoryGame] = useState(false);
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -76,9 +78,19 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback })
                 <section>
                     <SectionTitle icon={<HelpCircleIcon className="w-8 h-8" />} title="اختبر معلوماتك عني!" />
                     <Card glowColor="blue">
-                        <QuizGame />
+                        <QuizGame onQuizComplete={() => setShowMemoryGame(true)} />
                     </Card>
                 </section>
+
+                {/* Memory Game Section */}
+                {showMemoryGame && (
+                    <section>
+                        <SectionTitle icon={<BrainCircuitIcon className="w-8 h-8"/>} title="لعبة الذاكرة" />
+                        <Card glowColor="purple">
+                            <MemoryGame />
+                        </Card>
+                    </section>
+                )}
 
                 {/* Achievements Section */}
                 <section>

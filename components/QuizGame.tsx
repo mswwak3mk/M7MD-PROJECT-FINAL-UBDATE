@@ -2,7 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { quizQuestions } from '../constants';
 import NeonButton from './Button';
 
-const QuizGame: React.FC = () => {
+interface QuizGameProps {
+    onQuizComplete: () => void;
+}
+
+const QuizGame: React.FC<QuizGameProps> = ({ onQuizComplete }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -27,6 +31,7 @@ const QuizGame: React.FC = () => {
             setCurrentQuestionIndex(prev => prev + 1);
         } else {
             setQuizFinished(true);
+            onQuizComplete();
         }
     };
 
