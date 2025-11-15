@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
-import type { PortfolioData } from '../types';
+import React, { useEffect, useState } from 'react';
+import type { PortfolioData, TeacherFeedback } from '../types';
 import AnimatedBackground from './AnimatedBackground';
 import Card from './Card';
+import NeonButton from './Button';
 import { GamepadIcon, UserIcon, TrophyIcon, BrainCircuitIcon, TeacherIcon, CircuitBoardIcon, ControllerIcon, HelpCircleIcon } from './icons';
 import SnakeGame from './SnakeGame';
 import QuizGame from './QuizGame';
 
 interface VisitorPageProps {
   data: PortfolioData;
+  onAddTeacherFeedback: (feedback: Omit<TeacherFeedback, 'id'>) => void;
 }
 
 const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon, title }) => (
@@ -19,8 +21,17 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
     </div>
 );
 
-const VisitorPage: React.FC<VisitorPageProps> = ({ data }) => {
+const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback }) => {
   const { profile, achievements, skills, favoriteSubjects, teacherFeedback } = data;
+  const [newFeedback, setNewFeedback] = useState({ teacherName: '', comment: '' });
+
+  const handleFeedbackSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (newFeedback.teacherName.trim() && newFeedback.comment.trim()) {
+          onAddTeacherFeedback(newFeedback);
+          setNewFeedback({ teacherName: '', comment: '' });
+      }
+  };
 
   useEffect(() => {
     const element = document.getElementById('hero-section');
@@ -126,7 +137,7 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data }) => {
                 <section>
                     <SectionTitle icon={<TeacherIcon className="w-8 h-8"/>} title="آراء وتعليقات المعلمين" />
                     <div className="space-y-6">
-                        {teacherFeedback.map((feedback) => (
+                        {teacherFeedback.length > 0 ? teacherFeedback.map((feedback) => (
                             <Card key={feedback.id} glowColor="purple">
                                 <div className="flex items-start gap-4">
                                     <div className="bg-purple-500/20 p-3 rounded-full">
@@ -138,8 +149,40 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data }) => {
                                     </div>
                                 </div>
                             </Card>
-                        ))}
+                        )) : (
+                           <p className="text-center text-gray-400">لا توجد تعليقات بعد. كن أول من يترك تعليقاً!</p>
+                        )}
                     </div>
+
+                    <Card glowColor="green" className="mt-8">
+                        <h3 className="text-xl font-bold text-green-300 mb-4">أضف تعليقك</h3>
+                        <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="teacherName" className="block text-sm font-medium text-gray-300 mb-1">الاسم</label>
+                                <input
+                                    id="teacherName"
+                                    type="text"
+                                    placeholder="اسم المعلم"
+                                    value={newFeedback.teacherName}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, teacherName: e.target.value })}
+                                    className="w-full bg-[#1f2937] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="comment" className="block text-sm font-medium text-gray-300 mb-1">التعليق</label>
+                                <textarea
+                                    id="comment"
+                                    placeholder="اكتب تعليقك هنا..."
+                                    value={newFeedback.comment}
+                                    onChange={(e) => setNewFeedback({ ...newFeedback, comment: e.target.value })}
+                                    className="w-full h-24 bg-[#1f2937] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-green-400 focus:outline-none resize-none"
+                                    required
+                                ></textarea>
+                            </div>
+                            <NeonButton type="submit" glowColor="green">إرسال التعليق</NeonButton>
+                        </form>
+                    </Card>
                 </section>
             </div>
             

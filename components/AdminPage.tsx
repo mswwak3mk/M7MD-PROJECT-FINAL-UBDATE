@@ -14,6 +14,7 @@ interface AdminPageProps {
   onAddSkill: (skill: Omit<Skill, 'id'>) => void;
   onDeleteSkill: (id: string) => void;
   onUpdateNotes: (notes: string) => void;
+  onDeleteTeacherFeedback: (id: string) => void;
 }
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -34,8 +35,9 @@ const AdminPage: React.FC<AdminPageProps> = ({
     onAddSkill,
     onDeleteSkill,
     onUpdateNotes,
+    onDeleteTeacherFeedback,
 }) => {
-    const { profile, achievements, skills, personalNotes } = data;
+    const { profile, achievements, skills, personalNotes, teacherFeedback } = data;
 
     const [newAchievement, setNewAchievement] = useState({ title: '', description: '', proofUrl: '' });
     const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
@@ -202,6 +204,24 @@ const AdminPage: React.FC<AdminPageProps> = ({
                     <NeonButton onClick={handleAddNewSkill} glowColor="blue" className="px-4 py-2"><PlusIcon /></NeonButton>
                  </div>
             </Card>
+        </section>
+
+        {/* Teacher Feedback Management */}
+        <section className="mt-12">
+            <h2 className="text-3xl font-bold text-center mb-6 text-purple-400">إدارة تعليقات المعلمين</h2>
+            <div className="space-y-4">
+                {teacherFeedback.length > 0 ? teacherFeedback.map(fb => (
+                    <Card key={fb.id} className="flex justify-between items-center" glowColor="purple">
+                        <div>
+                            <h4 className="font-bold text-purple-300">{fb.teacherName}</h4>
+                            <p className="text-sm text-gray-400 italic">"{fb.comment}"</p>
+                        </div>
+                        <button onClick={() => onDeleteTeacherFeedback(fb.id)} className="p-2 text-red-500 hover:text-red-400 flex-shrink-0">
+                            <TrashIcon />
+                        </button>
+                    </Card>
+                )) : ( <p className="text-center text-gray-500">لا توجد تعليقات للمراجعة حالياً.</p> )}
+            </div>
         </section>
       </div>
     </div>

@@ -29,7 +29,13 @@ export const INITIAL_DATA: PortfolioData = {
     { id: '4', name: 'السباحة' },
   ],
   favoriteSubjects: ['مادة العلوم', 'مادة الاجتماعيات'],
-  teacherFeedback: [],
+  teacherFeedback: [
+    {
+      id: 'tf1',
+      teacherName: 'الأستاذ خالد',
+      comment: 'محمد طالب مجتهد ومتميز، يظهر شغفًا كبيرًا بالتعلم والمشاركة في الأنشطة الصفية. أتمنى له كل التوفيق.',
+    }
+  ],
   personalNotes: 'يجب أن أركز على تعلم لغة برمجة C++ لمحركات الألعاب هذا الشهر.',
 };
 
