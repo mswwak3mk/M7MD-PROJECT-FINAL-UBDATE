@@ -101,19 +101,28 @@ export const HelpCircleIcon: React.FC<{ className?: string }> = ({ className }) 
 
 export const HandRockIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 13V9a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h4c.55 0 1-.45 1-1z" /><path d="M16 9h1a2 2 0 1 1 0 4h-1" /><path d="M12 9h1a2 2 0 1 1 0 4h-1" /><path d="M6 13V9a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h1c.55 0 1-.45 1-1z" /><path d="M9 13V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h1c.55 0 1-.45 1-1z" /><path d="M4 16.5A2.5 2.5 0 0 1 6.5 19H18a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-4Z" />
+        <path d="M12 22a9.94 9.94 0 0 0 4.1-1.9c2.4-1.8 3.9-4.5 3.9-7.6 0-2.9-1.3-5.4-3.4-7.1" />
+        <path d="M10.5 5.5a1 1 0 0 0-1.4 1.4L11 8.8a1 1 0 0 0 1.4 0l1.9-1.9a1 1 0 0 0-1.4-1.4L12 6l-1.5-.5Z" />
+        <path d="M15.5 10.5a1 1 0 0 0-1.4 1.4l.8.8a1 1 0 0 0 1.4 0l1.9-1.9a1 1 0 0 0-1.4-1.4l-.8.8Z" />
+        <path d="M8 12.5a1 1 0 0 0-1.4 1.4l.8.8a1 1 0 0 0 1.4 0l1.9-1.9a1 1 0 0 0-1.4-1.4l-.8.8Z" />
+        <path d="M12 22a9.94 9.94 0 0 1-4.1-1.9C5.5 18.3 4 15.6 4 12.5c0-2.9 1.3-5.4 3.4-7.1" />
     </svg>
 );
 
 export const HandPaperIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 16.5V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v7.5c0 .83.67 1.5 1.5 1.5H11a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-10A2.5 2.5 0 0 1 6.5 8H11a2 2 0 0 1 2 2v6.5" /><path d="M18 13.5V9a1 1 0 0 0-1-1h-1.5a1.5 1.5 0 0 0-1.5 1.5V13" /><path d="M8 12h3" />
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
     </svg>
 );
 
 export const HandScissorsIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 16.5V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v7.5c0 .83.67 1.5 1.5 1.5H11a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-10A2.5 2.5 0 0 1 6.5 8H11a2 2 0 0 1 2 2v6.5" /><path d="M16 13.5V9a1 1 0 0 1 1-1h1.5a1.5 1.5 0 0 1 1.5 1.5V13" /><path d="M22 12.5a2.5 2.5 0 0 0-2.5-2.5h-1a2.5 2.5 0 0 0-2.5 2.5v1.5a1 1 0 0 0 1 1H21a1 1 0 0 0 1-1Z" />
+        <circle cx="6" cy="6" r="3"></circle>
+        <circle cx="6" cy="18" r="3"></circle>
+        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
     </svg>
 );
 
@@ -138,5 +147,11 @@ export const ZapIcon: React.FC<{ className?: string }> = ({ className }) => (
 export const MousePointerClickIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="m9 9 5 12 1.8-5.2L21 14Z" /><path d="M3.5 3.5 9 9" /><path d="M14.5 9.5a.5.5 0 0 1 0 1" /><path d="M11.5 12.5a.5.5 0 0 1 0 1" /><path d="M8.5 15.5a.5.5 0 0 1 0 1" /><path d="M12 21.5a.5.5 0 0 1 1 0" /><path d="M15 18.5a.5.5 0 0 1 1 0" /><path d="M18 15.5a.5.5 0 0 1 1 0" /><path d="M21 12.5a.5.5 0 0 1 1 0" />
+    </svg>
+);
+
+export const ChevronLeftIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
     </svg>
 );

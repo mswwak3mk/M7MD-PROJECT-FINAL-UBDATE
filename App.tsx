@@ -3,11 +3,14 @@ import type { PortfolioData, Achievement, Skill, TeacherFeedback } from './types
 import { INITIAL_DATA } from './constants';
 import VisitorPage from './components/VisitorPage';
 import AdminPage from './components/AdminPage';
+import GamesPage from './components/GamesPage';
+import AnimatedBackground from './components/AnimatedBackground';
 import { AdminIcon } from './components/icons';
 
 const App: React.FC = () => {
   const [isAdminView, setIsAdminView] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<'main' | 'games'>('main');
   const [data, setData] = useState<PortfolioData>(() => {
     try {
       const savedData = localStorage.getItem('portfolioData');
@@ -108,8 +111,19 @@ const App: React.FC = () => {
     }));
   };
 
+  const renderVisitorContent = () => {
+    switch(currentPage) {
+        case 'games':
+            return <GamesPage onBack={() => setCurrentPage('main')} />;
+        case 'main':
+        default:
+            return <VisitorPage data={data} onAddTeacherFeedback={handleAddTeacherFeedback} onShowGames={() => setCurrentPage('games')} />;
+    }
+  }
+
   return (
     <div className="bg-[#0a0f1c] text-gray-200 min-h-screen">
+       <AnimatedBackground />
       <button
         onClick={handleAdminToggle}
         className="fixed bottom-4 left-4 z-50 bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-full shadow-lg shadow-purple-500/50 transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -130,7 +144,7 @@ const App: React.FC = () => {
             onDeleteTeacherFeedback={handleDeleteTeacherFeedback}
         />
       ) : (
-        <VisitorPage data={data} onAddTeacherFeedback={handleAddTeacherFeedback} />
+        renderVisitorContent()
       )}
     </div>
   );

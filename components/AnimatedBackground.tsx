@@ -1,12 +1,11 @@
-
 import React from 'react';
 
 const AnimatedBackground: React.FC = () => {
   return (
-    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-      <div className="absolute w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(29,39,57,0.8)_0%,_rgba(10,15,28,1)_100%)]"></div>
+    <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0">
+      <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_rgba(29,39,57,0.8)_0%,_rgba(10,15,28,1)_100%)]"></div>
       <div
-        className="absolute w-full h-full"
+        className="absolute w-full h-full top-0 left-0"
         style={{
           backgroundImage: `
             linear-gradient(rgba(10, 15, 28, 0.95) 0%, rgba(10, 15, 28, 0.95) 100%),
