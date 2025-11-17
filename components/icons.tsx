@@ -98,3 +98,45 @@ export const HelpCircleIcon: React.FC<{ className?: string }> = ({ className }) 
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
     </svg>
 );
+
+export const HandRockIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 13V9a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h4c.55 0 1-.45 1-1z" /><path d="M16 9h1a2 2 0 1 1 0 4h-1" /><path d="M12 9h1a2 2 0 1 1 0 4h-1" /><path d="M6 13V9a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h1c.55 0 1-.45 1-1z" /><path d="M9 13V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v4c0 .55.45 1 1 1h1c.55 0 1-.45 1-1z" /><path d="M4 16.5A2.5 2.5 0 0 1 6.5 19H18a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-4Z" />
+    </svg>
+);
+
+export const HandPaperIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 16.5V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v7.5c0 .83.67 1.5 1.5 1.5H11a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-10A2.5 2.5 0 0 1 6.5 8H11a2 2 0 0 1 2 2v6.5" /><path d="M18 13.5V9a1 1 0 0 0-1-1h-1.5a1.5 1.5 0 0 0-1.5 1.5V13" /><path d="M8 12h3" />
+    </svg>
+);
+
+export const HandScissorsIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 16.5V9a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v7.5c0 .83.67 1.5 1.5 1.5H11a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H6.5A2.5 2.5 0 0 1 4 20.5v-10A2.5 2.5 0 0 1 6.5 8H11a2 2 0 0 1 2 2v6.5" /><path d="M16 13.5V9a1 1 0 0 1 1-1h1.5a1.5 1.5 0 0 1 1.5 1.5V13" /><path d="M22 12.5a2.5 2.5 0 0 0-2.5-2.5h-1a2.5 2.5 0 0 0-2.5 2.5v1.5a1 1 0 0 0 1 1H21a1 1 0 0 0 1-1Z" />
+    </svg>
+);
+
+export const HashIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /><line x1="9" y1="4" x2="9" y2="20" /><line x1="15" y1="4" x2="15" y2="20" />
+    </svg>
+);
+
+export const ALargeSmallIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 14h-5" /><path d="M16 16v-3.5a2.5 2.5 0 0 1 5 0V16" /><path d="M18.5 12.5v3.5" /><path d="M4 6h7" /><path d="M7 4v5" />
+    </svg>
+);
+
+export const ZapIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </svg>
+);
+
+export const MousePointerClickIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m9 9 5 12 1.8-5.2L21 14Z" /><path d="M3.5 3.5 9 9" /><path d="M14.5 9.5a.5.5 0 0 1 0 1" /><path d="M11.5 12.5a.5.5 0 0 1 0 1" /><path d="M8.5 15.5a.5.5 0 0 1 0 1" /><path d="M12 21.5a.5.5 0 0 1 1 0" /><path d="M15 18.5a.5.5 0 0 1 1 0" /><path d="M18 15.5a.5.5 0 0 1 1 0" /><path d="M21 12.5a.5.5 0 0 1 1 0" />
+    </svg>
+);

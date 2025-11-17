@@ -7,6 +7,11 @@ import { GamepadIcon, UserIcon, TrophyIcon, BrainCircuitIcon, TeacherIcon, Circu
 import SnakeGame from './SnakeGame';
 import QuizGame from './QuizGame';
 import MemoryGame from './MemoryGame';
+import HangmanGame from './HangmanGame';
+import TicTacToeGame from './TicTacToeGame';
+import RockPaperScissorsGame from './RockPaperScissorsGame';
+import ReactionTimeGame from './ReactionTimeGame';
+import ClickerGame from './ClickerGame';
 
 interface VisitorPageProps {
   data: PortfolioData;
@@ -117,6 +122,18 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback })
                     <Card glowColor="purple">
                         <SnakeGame />
                     </Card>
+                </section>
+
+                {/* More Games Section */}
+                <section>
+                    <SectionTitle icon={<GamepadIcon className="w-8 h-8"/>} title="المزيد من الألعاب" />
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <Card glowColor="green"><HangmanGame /></Card>
+                        <Card glowColor="blue"><TicTacToeGame /></Card>
+                        <Card glowColor="purple"><RockPaperScissorsGame /></Card>
+                        <Card glowColor="green"><ReactionTimeGame /></Card>
+                        <Card glowColor="blue" className="md:col-span-2"><ClickerGame /></Card>
+                    </div>
                 </section>
                 
                 <div className="grid md:grid-cols-2 gap-16">
