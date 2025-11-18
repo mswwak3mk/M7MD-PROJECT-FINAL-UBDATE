@@ -19,11 +19,19 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
+    
+    // Enable offline persistence to speed up load times
+    firebase.firestore().enablePersistence()
+        .catch((err: any) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: multiple tabs open');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported by browser');
+            }
+        });
 }
 
 export const db = firebase.firestore();
-// Storage is no longer used as per request to store Base64 in Firestore
-// export const storage = firebase.storage();
 
 // A single document will hold all portfolio data
 export const portfolioDocRef = db.collection('portfolio').doc('data');

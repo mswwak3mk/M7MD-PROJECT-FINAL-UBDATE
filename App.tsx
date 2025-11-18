@@ -20,23 +20,30 @@ const App: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const docSnap = await portfolioDocRef.get();
+    // Use onSnapshot instead of get() for real-time updates and faster caching
+    const unsubscribe = portfolioDocRef.onSnapshot(
+      (docSnap) => {
         if (docSnap.exists) {
           setData(docSnap.data() as PortfolioData);
         } else {
-          await portfolioDocRef.set(INITIAL_DATA);
-          setData(INITIAL_DATA);
+          // Only set initial data if document definitely doesn't exist
+          // and we are not already waiting for a write
+          if (!data) {
+             portfolioDocRef.set(INITIAL_DATA).catch(console.error);
+             setData(INITIAL_DATA);
+          }
         }
-      } catch (error) {
+        setLoading(false);
+      },
+      (error) => {
         console.error("Error fetching portfolio data:", error);
-        setData(INITIAL_DATA); // Fallback on error
-      } finally {
+        // Only fallback if we don't have data yet
+        if (!data) setData(INITIAL_DATA);
         setLoading(false);
       }
-    };
-    fetchData();
+    );
+
+    return () => unsubscribe();
   }, []);
 
   const handleAdminToggle = () => {
@@ -61,12 +68,49 @@ const App: React.FC = () => {
     }
   };
 
-  const fileToBase64 = (file: File): Promise<string> => {
+  // Function to compress and convert image to Base64
+  // This is crucial because Firestore has a 1MB limit per document
+  const compressAndConvertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = error => reject(error);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // Resize to max 800px
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // Convert to JPEG with 0.7 quality to save space
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    resolve(dataUrl);
+                } else {
+                    reject(new Error("Could not get canvas context"));
+                }
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (error) => reject(error);
     });
   };
 
@@ -74,17 +118,17 @@ const App: React.FC = () => {
     if (!data) return;
     setLoading(true);
     try {
-      // Convert image to Base64 string
-      const base64 = await fileToBase64(imageFile);
+      // Compress and convert
+      const base64 = await compressAndConvertToBase64(imageFile);
       
-      // Update Firestore directly with the Base64 string
       const updatedProfile = { ...data.profile, imageUrl: base64 };
       await portfolioDocRef.update({ profile: updatedProfile });
       
+      // Optimistic update
       setData(prev => prev ? { ...prev, profile: updatedProfile } : null);
     } catch (error) {
       console.error("Error updating profile image:", error);
-      alert("حدث خطأ أثناء تحديث الصورة. قد يكون حجم الصورة كبيراً جداً لقاعدة البيانات.");
+      alert("حدث خطأ أثناء تحديث الصورة. تأكد أن الصورة ليست تالفة.");
     } finally {
       setLoading(false);
     }
@@ -98,16 +142,15 @@ const App: React.FC = () => {
 
     try {
       if (imageFile) {
-        // Convert image to Base64 string
-        const base64 = await fileToBase64(imageFile);
+        const base64 = await compressAndConvertToBase64(imageFile);
         achievementToAdd.proofUrl = base64;
       }
       
       await portfolioDocRef.update({ achievements: firebase.firestore.FieldValue.arrayUnion(achievementToAdd) });
-      setData(prev => prev ? { ...prev, achievements: [...prev.achievements, achievementToAdd] } : null);
+      // No need to setData manually if onSnapshot is working, but good for responsiveness
     } catch (error) {
       console.error("Error adding achievement:", error);
-      alert("حدث خطأ أثناء إضافة الإنجاز. قد يكون حجم الصورة كبيراً جداً.");
+      alert("حدث خطأ أثناء إضافة الإنجاز.");
     } finally {
       setLoading(false);
     }
@@ -120,20 +163,17 @@ const App: React.FC = () => {
     
     try {
       if (imageFile) {
-        // Convert image to Base64 string
-        const base64 = await fileToBase64(imageFile);
+        const base64 = await compressAndConvertToBase64(imageFile);
         finalAchievement.proofUrl = base64;
       }
       
-      // We update the specific achievement in the array by overwriting the array
-      // Note: Firestore limits documents to 1MB. Storing many Base64 images might hit this limit.
+      // We read the current state to map over it
       const updatedAchievements = data.achievements.map(ach => ach.id === finalAchievement.id ? finalAchievement : ach);
       
       await portfolioDocRef.update({ achievements: updatedAchievements });
-      setData(prev => prev ? { ...prev, achievements: updatedAchievements } : null);
     } catch (error) {
       console.error("Error updating achievement:", error);
-      alert("حدث خطأ أثناء تعديل الإنجاز. قد يكون حجم الصورة كبيراً جداً.");
+      alert("حدث خطأ أثناء تعديل الإنجاز.");
     } finally {
       setLoading(false);
     }
@@ -146,7 +186,6 @@ const App: React.FC = () => {
       const achievementToDelete = data.achievements.find(ach => ach.id === id);
       if(achievementToDelete) {
         await portfolioDocRef.update({ achievements: firebase.firestore.FieldValue.arrayRemove(achievementToDelete) });
-        setData(prev => prev ? { ...prev, achievements: prev.achievements.filter(ach => ach.id !== id) } : null);
       }
     } catch(error) {
        console.error("Error deleting achievement:", error);
@@ -159,7 +198,6 @@ const App: React.FC = () => {
     if (!data) return;
     const skillToAdd = { ...newSkill, id: Date.now().toString() };
     await portfolioDocRef.update({ skills: firebase.firestore.FieldValue.arrayUnion(skillToAdd) });
-    setData(prev => prev ? { ...prev, skills: [...prev.skills, skillToAdd] } : null);
   };
 
   const handleDeleteSkill = async (id: string) => {
@@ -167,20 +205,17 @@ const App: React.FC = () => {
     const skillToDelete = data.skills.find(skill => skill.id === id);
     if (skillToDelete) {
       await portfolioDocRef.update({ skills: firebase.firestore.FieldValue.arrayRemove(skillToDelete) });
-      setData(prev => prev ? { ...prev, skills: prev.skills.filter(skill => skill.id !== id) } : null);
     }
   };
 
   const handleUpdateNotes = async (notes: string) => {
     await portfolioDocRef.update({ personalNotes: notes });
-    setData(prev => prev ? { ...prev, personalNotes: notes } : null);
   };
 
   const handleAddTeacherFeedback = async (newFeedback: Omit<TeacherFeedback, 'id'>) => {
     if (!data) return;
     const feedbackToAdd = { ...newFeedback, id: Date.now().toString() };
     await portfolioDocRef.update({ teacherFeedback: firebase.firestore.FieldValue.arrayUnion(feedbackToAdd) });
-    setData(prev => prev ? { ...prev, teacherFeedback: [...prev.teacherFeedback, feedbackToAdd] } : null);
   };
 
   const handleDeleteTeacherFeedback = async (id: string) => {
@@ -188,7 +223,6 @@ const App: React.FC = () => {
     const feedbackToDelete = data.teacherFeedback.find(fb => fb.id === id);
     if(feedbackToDelete) {
         await portfolioDocRef.update({ teacherFeedback: firebase.firestore.FieldValue.arrayRemove(feedbackToDelete) });
-        setData(prev => prev ? { ...prev, teacherFeedback: prev.teacherFeedback.filter(fb => fb.id !== id) } : null);
     }
   };
 
