@@ -7,24 +7,15 @@ import { PlusIcon, TrashIcon, EditIcon } from './icons';
 
 interface AdminPageProps {
   data: PortfolioData;
-  onUpdateProfileImage: (url: string) => void;
-  onAddAchievement: (achievement: Omit<Achievement, 'id'>) => void;
-  onUpdateAchievement: (achievement: Achievement) => void;
-  onDeleteAchievement: (id: string) => void;
-  onAddSkill: (skill: Omit<Skill, 'id'>) => void;
-  onDeleteSkill: (id: string) => void;
-  onUpdateNotes: (notes: string) => void;
-  onDeleteTeacherFeedback: (id: string) => void;
+  onUpdateProfileImage: (file: File) => Promise<void>;
+  onAddAchievement: (achievement: Omit<Achievement, 'id'>, imageFile?: File) => Promise<void>;
+  onUpdateAchievement: (achievement: Achievement, imageFile?: File) => Promise<void>;
+  onDeleteAchievement: (id: string) => Promise<void>;
+  onAddSkill: (skill: Omit<Skill, 'id'>) => Promise<void>;
+  onDeleteSkill: (id: string) => Promise<void>;
+  onUpdateNotes: (notes: string) => Promise<void>;
+  onDeleteTeacherFeedback: (id: string) => Promise<void>;
 }
-
-const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = error => reject(error);
-    });
-};
 
 const AdminPage: React.FC<AdminPageProps> = ({ 
     data, 
@@ -39,46 +30,51 @@ const AdminPage: React.FC<AdminPageProps> = ({
 }) => {
     const { profile, achievements, skills, personalNotes, teacherFeedback } = data;
 
-    const [newAchievement, setNewAchievement] = useState({ title: '', description: '', proofUrl: '' });
+    const [newAchievement, setNewAchievement] = useState({ title: '', description: ''});
+    const [newAchievementFile, setNewAchievementFile] = useState<File | null>(null);
+
     const [editingAchievement, setEditingAchievement] = useState<Achievement | null>(null);
+    const [editingAchievementFile, setEditingAchievementFile] = useState<File | null>(null);
+
     const [newSkillName, setNewSkillName] = useState('');
     const [notes, setNotes] = useState(personalNotes);
 
     const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const base64 = await fileToBase64(e.target.files[0]);
-            onUpdateProfileImage(base64);
+            await onUpdateProfileImage(e.target.files[0]);
         }
     };
     
-    const handleAchievementImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAchievementImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const base64 = await fileToBase64(e.target.files[0]);
+            const file = e.target.files[0];
             if (editingAchievement) {
-                setEditingAchievement({ ...editingAchievement, proofUrl: base64 });
+                setEditingAchievementFile(file);
             } else {
-                setNewAchievement({ ...newAchievement, proofUrl: base64 });
+                setNewAchievementFile(file);
             }
         }
     };
 
-    const handleSaveAchievement = () => {
+    const handleSaveAchievement = async () => {
         if (editingAchievement) {
             if (editingAchievement.title && editingAchievement.description) {
-                onUpdateAchievement(editingAchievement);
+                await onUpdateAchievement(editingAchievement, editingAchievementFile || undefined);
                 setEditingAchievement(null);
+                setEditingAchievementFile(null);
             }
         } else {
             if (newAchievement.title && newAchievement.description) {
-                onAddAchievement(newAchievement);
-                setNewAchievement({ title: '', description: '', proofUrl: '' });
+                await onAddAchievement(newAchievement, newAchievementFile || undefined);
+                setNewAchievement({ title: '', description: '' });
+                setNewAchievementFile(null);
             }
         }
     };
 
-    const handleAddNewSkill = () => {
+    const handleAddNewSkill = async () => {
         if (newSkillName.trim()) {
-            onAddSkill({ name: newSkillName.trim() });
+            await onAddSkill({ name: newSkillName.trim() });
             setNewSkillName('');
         }
     };
@@ -139,7 +135,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
                                 <p className="text-sm text-gray-400">{ach.description}</p>
                             </div>
                             <div className="flex gap-2 flex-shrink-0 ml-4">
-                                <button onClick={() => setEditingAchievement(ach)} className="p-2 text-cyan-400 hover:text-cyan-300"><EditIcon /></button>
+                                <button onClick={() => {setEditingAchievement(ach); setEditingAchievementFile(null);}} className="p-2 text-cyan-400 hover:text-cyan-300"><EditIcon /></button>
                                 <button onClick={() => onDeleteAchievement(ach.id)} className="p-2 text-red-500 hover:text-red-400"><TrashIcon /></button>
                             </div>
                         </div>
@@ -168,7 +164,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
                             <span className="text-sm text-cyan-400 hover:underline">رفع ملف أو صورة إثبات</span>
                             <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleAchievementImageUpload} />
                         </label>
-                        {(editingAchievement?.proofUrl || newAchievement.proofUrl) && <span className="text-sm text-green-400">تم رفع الملف.</span>}
+                        {(editingAchievementFile || newAchievementFile) && <span className="text-sm text-green-400">تم تحديد ملف جديد.</span>}
                     </div>
                     <div className="flex gap-4">
                         <NeonButton onClick={handleSaveAchievement} glowColor="green">{editingAchievement ? 'حفظ التعديلات' : 'إضافة الإنجاز'}</NeonButton>

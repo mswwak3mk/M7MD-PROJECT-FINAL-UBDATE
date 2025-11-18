@@ -8,7 +8,7 @@ import MemoryGame from './MemoryGame';
 
 interface VisitorPageProps {
   data: PortfolioData;
-  onAddTeacherFeedback: (feedback: Omit<TeacherFeedback, 'id'>) => void;
+  onAddTeacherFeedback: (feedback: Omit<TeacherFeedback, 'id'>) => Promise<void>;
   onShowGames: () => void;
 }
 
@@ -26,10 +26,10 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback, o
   const [newFeedback, setNewFeedback] = useState({ teacherName: '', comment: '' });
   const [showMemoryGame, setShowMemoryGame] = useState(false);
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (newFeedback.teacherName.trim() && newFeedback.comment.trim()) {
-          onAddTeacherFeedback(newFeedback);
+          await onAddTeacherFeedback(newFeedback);
           setNewFeedback({ teacherName: '', comment: '' });
       }
   };
