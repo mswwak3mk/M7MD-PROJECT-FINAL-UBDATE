@@ -1,11 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
-// Fix: Update Firebase imports for v8 compatibility
-// Fix: Use firebase v9 compat libraries to support v8 namespaced API.
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/firestore';
 import type { PortfolioData, Achievement, Skill, TeacherFeedback } from './types';
 import { INITIAL_DATA } from './constants';
-import { portfolioDocRef, storage } from './firebase';
+// Import the global firebase object wrapper from our local file
+import firebase, { portfolioDocRef } from './firebase';
 import VisitorPage from './components/VisitorPage';
 import AdminPage from './components/AdminPage';
 import GamesPage from './components/GamesPage';
@@ -24,12 +22,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fix: Use v8 syntax for getting a document
         const docSnap = await portfolioDocRef.get();
         if (docSnap.exists) {
           setData(docSnap.data() as PortfolioData);
         } else {
-          // Fix: Use v8 syntax for setting a document
           await portfolioDocRef.set(INITIAL_DATA);
           setData(INITIAL_DATA);
         }
@@ -78,18 +74,17 @@ const App: React.FC = () => {
     if (!data) return;
     setLoading(true);
     try {
-      // Fix: Use v8 syntax for storage reference and upload
-      const storageRef = storage.ref('profileImage');
+      // Convert image to Base64 string
       const base64 = await fileToBase64(imageFile);
-      await storageRef.putString(base64, 'data_url');
-      const imageUrl = await storageRef.getDownloadURL();
       
-      const updatedProfile = { ...data.profile, imageUrl };
-      // Fix: Use v8 syntax for updating a document
+      // Update Firestore directly with the Base64 string
+      const updatedProfile = { ...data.profile, imageUrl: base64 };
       await portfolioDocRef.update({ profile: updatedProfile });
+      
       setData(prev => prev ? { ...prev, profile: updatedProfile } : null);
     } catch (error) {
       console.error("Error updating profile image:", error);
+      alert("حدث خطأ أثناء تحديث الصورة. قد يكون حجم الصورة كبيراً جداً لقاعدة البيانات.");
     } finally {
       setLoading(false);
     }
@@ -103,18 +98,16 @@ const App: React.FC = () => {
 
     try {
       if (imageFile) {
-        // Fix: Use v8 syntax for storage reference and upload
-        const storageRef = storage.ref(`achievements/${id}`);
+        // Convert image to Base64 string
         const base64 = await fileToBase64(imageFile);
-        await storageRef.putString(base64, 'data_url');
-        const proofUrl = await storageRef.getDownloadURL();
-        achievementToAdd.proofUrl = proofUrl;
+        achievementToAdd.proofUrl = base64;
       }
-      // Fix: Use v8 syntax for arrayUnion
+      
       await portfolioDocRef.update({ achievements: firebase.firestore.FieldValue.arrayUnion(achievementToAdd) });
       setData(prev => prev ? { ...prev, achievements: [...prev.achievements, achievementToAdd] } : null);
     } catch (error) {
       console.error("Error adding achievement:", error);
+      alert("حدث خطأ أثناء إضافة الإنجاز. قد يكون حجم الصورة كبيراً جداً.");
     } finally {
       setLoading(false);
     }
@@ -127,19 +120,20 @@ const App: React.FC = () => {
     
     try {
       if (imageFile) {
-        // Fix: Use v8 syntax for storage reference and upload
-        const storageRef = storage.ref(`achievements/${finalAchievement.id}`);
+        // Convert image to Base64 string
         const base64 = await fileToBase64(imageFile);
-        await storageRef.putString(base64, 'data_url');
-        const proofUrl = await storageRef.getDownloadURL();
-        finalAchievement.proofUrl = proofUrl;
+        finalAchievement.proofUrl = base64;
       }
+      
+      // We update the specific achievement in the array by overwriting the array
+      // Note: Firestore limits documents to 1MB. Storing many Base64 images might hit this limit.
       const updatedAchievements = data.achievements.map(ach => ach.id === finalAchievement.id ? finalAchievement : ach);
-      // Fix: Use v8 syntax for updating a document
+      
       await portfolioDocRef.update({ achievements: updatedAchievements });
       setData(prev => prev ? { ...prev, achievements: updatedAchievements } : null);
     } catch (error) {
       console.error("Error updating achievement:", error);
+      alert("حدث خطأ أثناء تعديل الإنجاز. قد يكون حجم الصورة كبيراً جداً.");
     } finally {
       setLoading(false);
     }
@@ -151,7 +145,6 @@ const App: React.FC = () => {
     try {
       const achievementToDelete = data.achievements.find(ach => ach.id === id);
       if(achievementToDelete) {
-        // Fix: Use v8 syntax for arrayRemove
         await portfolioDocRef.update({ achievements: firebase.firestore.FieldValue.arrayRemove(achievementToDelete) });
         setData(prev => prev ? { ...prev, achievements: prev.achievements.filter(ach => ach.id !== id) } : null);
       }
@@ -165,7 +158,6 @@ const App: React.FC = () => {
   const handleAddSkill = async (newSkill: Omit<Skill, 'id'>) => {
     if (!data) return;
     const skillToAdd = { ...newSkill, id: Date.now().toString() };
-    // Fix: Use v8 syntax for arrayUnion
     await portfolioDocRef.update({ skills: firebase.firestore.FieldValue.arrayUnion(skillToAdd) });
     setData(prev => prev ? { ...prev, skills: [...prev.skills, skillToAdd] } : null);
   };
@@ -174,14 +166,12 @@ const App: React.FC = () => {
     if (!data) return;
     const skillToDelete = data.skills.find(skill => skill.id === id);
     if (skillToDelete) {
-      // Fix: Use v8 syntax for arrayRemove
       await portfolioDocRef.update({ skills: firebase.firestore.FieldValue.arrayRemove(skillToDelete) });
       setData(prev => prev ? { ...prev, skills: prev.skills.filter(skill => skill.id !== id) } : null);
     }
   };
 
   const handleUpdateNotes = async (notes: string) => {
-    // Fix: Use v8 syntax for updating a document
     await portfolioDocRef.update({ personalNotes: notes });
     setData(prev => prev ? { ...prev, personalNotes: notes } : null);
   };
@@ -189,7 +179,6 @@ const App: React.FC = () => {
   const handleAddTeacherFeedback = async (newFeedback: Omit<TeacherFeedback, 'id'>) => {
     if (!data) return;
     const feedbackToAdd = { ...newFeedback, id: Date.now().toString() };
-    // Fix: Use v8 syntax for arrayUnion
     await portfolioDocRef.update({ teacherFeedback: firebase.firestore.FieldValue.arrayUnion(feedbackToAdd) });
     setData(prev => prev ? { ...prev, teacherFeedback: [...prev.teacherFeedback, feedbackToAdd] } : null);
   };
@@ -198,7 +187,6 @@ const App: React.FC = () => {
     if (!data) return;
     const feedbackToDelete = data.teacherFeedback.find(fb => fb.id === id);
     if(feedbackToDelete) {
-        // Fix: Use v8 syntax for arrayRemove
         await portfolioDocRef.update({ teacherFeedback: firebase.firestore.FieldValue.arrayRemove(feedbackToDelete) });
         setData(prev => prev ? { ...prev, teacherFeedback: prev.teacherFeedback.filter(fb => fb.id !== id) } : null);
     }
