@@ -3,7 +3,7 @@ import type { PortfolioData, Achievement, Skill } from '../types';
 import Card from './Card';
 import NeonButton from './Button';
 import AnimatedBackground from './AnimatedBackground';
-import { PlusIcon, TrashIcon, EditIcon } from './icons';
+import { PlusIcon, TrashIcon, EditIcon, CameraIcon, TargetIcon, SparklesIcon } from 'lucide-react';
 
 interface AdminPageProps {
   data: PortfolioData;
@@ -45,9 +45,26 @@ const AdminPage: React.FC<AdminPageProps> = ({
     const [editingSkillName, setEditingSkillName] = useState('');
     const [notes, setNotes] = useState(personalNotes);
 
+    const [profilePreview, setProfilePreview] = useState<string | null>(null);
+    const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+
     const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            await onUpdateProfileImage(e.target.files[0]);
+            const file = e.target.files[0];
+            // Local preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+
+            setIsUploadingProfile(true);
+            try {
+                await onUpdateProfileImage(file);
+            } finally {
+                setIsUploadingProfile(false);
+                setProfilePreview(null);
+            }
         }
     };
     
@@ -118,15 +135,27 @@ const AdminPage: React.FC<AdminPageProps> = ({
         <div className="grid md:grid-cols-2 gap-8">
             {/* Profile Picture Section */}
             <Card glowColor="purple">
-                <h2 className="text-2xl font-bold mb-4 text-purple-300">صورتي الشخصية</h2>
-                <img src={profile.imageUrl} alt={`الصورة الشخصية الحالية للطالب ${profile.name}`} className="w-40 h-40 rounded-full object-cover mx-auto mb-4 border-4 border-purple-500" />
-                <p className="text-center text-gray-400 mb-4">هذه صورتي الشخصية، وأستطيع تعديلها أو تغييرها في أي وقت. الصورة تمثل هويتي داخل الموقع وتعكس طموحي وشغفي في عالم التقنية والـGaming.</p>
-                <div className="flex justify-center gap-4">
-                    <label className="cursor-pointer">
-                        <span className="inline-block bg-cyan-500/80 hover:bg-cyan-500 text-white font-bold px-6 py-2 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl shadow-cyan-500/50">رفع صورة جديدة</span>
-                        <input type="file" accept="image/*" className="hidden" aria-label="رفع صورة شخصية جديدة" onChange={handleProfileImageUpload} />
+                <h2 className="text-2xl font-bold mb-4 text-purple-300 flex items-center gap-2">
+                    <CameraIcon className="w-6 h-6" />
+                    صورتي الشخصية
+                </h2>
+                <div className="relative w-40 h-40 mx-auto mb-6 group">
+                    <img 
+                        src={profilePreview || profile.imageUrl} 
+                        alt={`الصورة الشخصية الحالية للطالب ${profile.name}`} 
+                        className={`w-full h-full rounded-full object-cover border-4 border-purple-500 shadow-xl transition-all duration-300 ${isUploadingProfile ? 'opacity-50 blur-sm' : ''}`} 
+                    />
+                    {isUploadingProfile && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+                    <label className="absolute bottom-0 right-0 p-2 bg-cyan-500 rounded-full cursor-pointer hover:bg-cyan-400 transition-colors shadow-lg group-hover:scale-110">
+                        <CameraIcon className="w-5 h-5 text-white" />
+                        <input type="file" accept="image/*" className="hidden" aria-label="رفع صورة شخصية جديدة" onChange={handleProfileImageUpload} disabled={isUploadingProfile} />
                     </label>
                 </div>
+                <p className="text-center text-gray-400 text-sm leading-relaxed mb-4">الصورة تعكس هويتك الرقمية وشغفك. يمكنك استبدالها بصورة تعبر عن طموحك في عالم التقنية.</p>
             </Card>
 
             {/* Personal Notes Section */}
@@ -253,51 +282,59 @@ const AdminPage: React.FC<AdminPageProps> = ({
             <h2 className="text-3xl font-bold text-center mb-6 text-blue-400">إدارة المهارات</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
                 {skills.map(skill => (
-                    <Card key={skill.id} className="relative p-2 text-center group" glowColor="blue">
+                    <Card 
+                        key={skill.id} 
+                        className={`relative p-2 text-center group transition-all duration-300 ${editingSkillId === skill.id ? 'ring-2 ring-yellow-400 scale-105' : ''}`} 
+                        glowColor={editingSkillId === skill.id ? "yellow" : "blue"}
+                    >
                         {editingSkillId === skill.id ? (
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 p-1">
                                 <input 
                                     type="text"
                                     value={editingSkillName}
                                     onChange={(e) => setEditingSkillName(e.target.value)}
-                                    className="w-full bg-[#111827] border border-cyan-500 rounded p-1 text-sm text-center focus:outline-none"
+                                    className="w-full bg-[#111827] border border-yellow-500 rounded p-1 text-sm text-center focus:outline-none text-white"
                                     autoFocus
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') handleSaveSkillEdit();
                                         if (e.key === 'Escape') setEditingSkillId(null);
                                     }}
                                 />
-                                <div className="flex justify-center gap-1">
-                                    <button onClick={handleSaveSkillEdit} className="text-green-400 text-xs hover:underline">حفظ</button>
+                                <div className="flex justify-center gap-2">
+                                    <button onClick={handleSaveSkillEdit} className="text-yellow-400 text-xs font-bold hover:underline">حفظ</button>
                                     <button onClick={() => setEditingSkillId(null)} className="text-gray-400 text-xs hover:underline">إلغاء</button>
                                 </div>
                             </div>
                         ) : (
-                            <>
-                                <span className="block py-2">{skill.name}</span>
+                            <div className="flex flex-col items-center gap-1 py-1">
+                                <TargetIcon className="w-4 h-4 text-cyan-400/50 group-hover:text-cyan-400 transition-colors" />
+                                <span className="block font-medium text-sm md:text-base">{skill.name}</span>
                                 <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button 
                                         onClick={() => handleStartEditSkill(skill)} 
-                                        className="p-1 text-cyan-400 bg-[#111827] rounded-full hover:text-cyan-300"
+                                        className="p-1 text-cyan-400 bg-[#111827] rounded-full hover:text-cyan-300 shadow-md"
                                         aria-label={`تعديل مهارة: ${skill.name}`}
                                     >
                                         <EditIcon className="w-3 h-3" />
                                     </button>
                                     <button 
                                         onClick={() => setSkillToDelete(skill)} 
-                                        className="p-1 text-red-500 bg-[#111827] rounded-full hover:text-red-400" 
+                                        className="p-1 text-red-500 bg-[#111827] rounded-full hover:text-red-400 shadow-md" 
                                         aria-label={`حذف مهارة: ${skill.name}`}
                                     >
                                         <TrashIcon className="w-3 h-3" />
                                     </button>
                                 </div>
-                            </>
+                            </div>
                         )}
                     </Card>
                 ))}
             </div>
             <Card glowColor="blue">
-                 <h3 className="text-2xl font-bold mb-4 text-gray-200">إضافة مهارة جديدة</h3>
+                 <h3 className="text-2xl font-bold mb-4 text-gray-200 flex items-center gap-2">
+                    <SparklesIcon className="w-6 h-6 text-yellow-400" />
+                    إضافة مهارة جديدة
+                 </h3>
                  <div className="flex gap-4">
                     <input 
                         type="text" 
@@ -335,9 +372,9 @@ const AdminPage: React.FC<AdminPageProps> = ({
                 <div className="relative w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
                     <Card glowColor="red" className="border-red-500/50">
                         <div className="text-center">
-                            <h3 id="delete-skill-modal-title" className="text-2xl font-bold mb-4 text-red-400">تأكيد الحذف</h3>
-                            <p className="text-gray-300 mb-8 font-medium">
-                                هل أنت متأكد من رغبتك في حذف مهارة <span className="text-blue-400 font-bold">"{skillToDelete.name}"</span>؟ لا يمكن التراجع عن هذا الإجراء.
+                            <h3 id="delete-skill-modal-title" className="text-2xl font-bold mb-4 text-red-400">تأكيد حذف المهارة</h3>
+                            <p className="text-gray-300 mb-8 font-medium italic">
+                                "هل أنت متأكد من رغبتك في حذف مهارة <span className="text-blue-400 font-bold">"{skillToDelete.name}"</span>؟"
                             </p>
                             <div className="flex justify-center gap-4">
                                 <button 
@@ -345,15 +382,15 @@ const AdminPage: React.FC<AdminPageProps> = ({
                                         await onDeleteSkill(skillToDelete.id);
                                         setSkillToDelete(null);
                                     }}
-                                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2 rounded-md transition-all duration-300 shadow-lg shadow-red-500/30"
+                                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-2 rounded-md transition-all duration-300 shadow-lg shadow-red-500/30"
                                 >
-                                    حذف المهارة
+                                    حذف (Delete)
                                 </button>
                                 <button 
                                     onClick={() => setSkillToDelete(null)}
-                                    className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+                                    className="px-8 py-2 text-gray-400 hover:text-white border border-gray-700 rounded-md hover:bg-gray-800 transition-colors"
                                 >
-                                    إلغاء
+                                    إلغاء (Cancel)
                                 </button>
                             </div>
                         </div>

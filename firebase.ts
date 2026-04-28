@@ -21,7 +21,7 @@ if (!firebase.apps.length) {
     firebase.analytics();
     
     // Enable offline persistence to speed up load times
-    firebase.firestore().enablePersistence()
+    firebase.firestore().enablePersistence({ synchronizeTabs: true })
         .catch((err: any) => {
             if (err.code == 'failed-precondition') {
                 console.log('Persistence failed: multiple tabs open');

@@ -202,7 +202,7 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback, o
         
         {/* Footer */}
         <footer className="text-center py-12 mt-16 border-t border-gray-800">
-            <p className="text-gray-400">© 2025 – ملف إنجاز الطالب {profile.name}</p>
+            <p className="text-gray-400">© 2026 – ملف إنجاز الطالب {profile.name}</p>
             <p className="text-gray-500 text-sm">تم التصميم بأسلوب Gaming يعكس شغفي وطموحي في عالم التقنية.</p>
         </footer>
     </main>
