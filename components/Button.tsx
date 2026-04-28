@@ -13,9 +13,15 @@ const NeonButton: React.FC<ButtonProps> = ({ children, className = '', glowColor
     green: 'bg-green-500/80 hover:bg-green-500 text-white shadow-green-500/50',
   };
 
+  const ringClasses = {
+    blue: 'focus:ring-cyan-400',
+    purple: 'focus:ring-purple-400',
+    green: 'focus:ring-green-400',
+  };
+
   return (
     <button
-      className={`px-6 py-2 rounded-md font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a0f1c] ${colorClasses[glowColor]} ${className}`}
+      className={`px-6 py-2 rounded-md font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0a0f1c] ${colorClasses[glowColor]} ${ringClasses[glowColor]} ${className}`}
       {...props}
     >
       {children}

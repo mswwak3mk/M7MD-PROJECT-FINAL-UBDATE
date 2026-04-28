@@ -37,6 +37,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
     const [editingAchievementFile, setEditingAchievementFile] = useState<File | null>(null);
 
     const [newSkillName, setNewSkillName] = useState('');
+    const [skillToDelete, setSkillToDelete] = useState<Skill | null>(null);
     const [notes, setNotes] = useState(personalNotes);
 
     const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,12 +101,12 @@ const AdminPage: React.FC<AdminPageProps> = ({
             {/* Profile Picture Section */}
             <Card glowColor="purple">
                 <h2 className="text-2xl font-bold mb-4 text-purple-300">صورتي الشخصية</h2>
-                <img src={profile.imageUrl} alt="الصورة الشخصية" className="w-40 h-40 rounded-full object-cover mx-auto mb-4 border-4 border-purple-500" />
+                <img src={profile.imageUrl} alt={`الصورة الشخصية الحالية للطالب ${profile.name}`} className="w-40 h-40 rounded-full object-cover mx-auto mb-4 border-4 border-purple-500" />
                 <p className="text-center text-gray-400 mb-4">هذه صورتي الشخصية، وأستطيع تعديلها أو تغييرها في أي وقت. الصورة تمثل هويتي داخل الموقع وتعكس طموحي وشغفي في عالم التقنية والـGaming.</p>
                 <div className="flex justify-center gap-4">
                     <label className="cursor-pointer">
                         <span className="inline-block bg-cyan-500/80 hover:bg-cyan-500 text-white font-bold px-6 py-2 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl shadow-cyan-500/50">رفع صورة جديدة</span>
-                        <input type="file" accept="image/*" className="hidden" onChange={handleProfileImageUpload} />
+                        <input type="file" accept="image/*" className="hidden" aria-label="رفع صورة شخصية جديدة" onChange={handleProfileImageUpload} />
                     </label>
                 </div>
             </Card>
@@ -135,8 +136,20 @@ const AdminPage: React.FC<AdminPageProps> = ({
                                 <p className="text-sm text-gray-400">{ach.description}</p>
                             </div>
                             <div className="flex gap-2 flex-shrink-0 ml-4">
-                                <button onClick={() => {setEditingAchievement(ach); setEditingAchievementFile(null);}} className="p-2 text-cyan-400 hover:text-cyan-300"><EditIcon /></button>
-                                <button onClick={() => onDeleteAchievement(ach.id)} className="p-2 text-red-500 hover:text-red-400"><TrashIcon /></button>
+                                <button 
+                                    onClick={() => {setEditingAchievement(ach); setEditingAchievementFile(null);}} 
+                                    className="p-2 text-cyan-400 hover:text-cyan-300" 
+                                    aria-label={`تعديل إنجاز: ${ach.title}`}
+                                >
+                                    <EditIcon />
+                                </button>
+                                <button 
+                                    onClick={() => onDeleteAchievement(ach.id)} 
+                                    className="p-2 text-red-500 hover:text-red-400" 
+                                    aria-label={`حذف إنجاز: ${ach.title}`}
+                                >
+                                    <TrashIcon />
+                                </button>
                             </div>
                         </div>
                     </Card>
@@ -181,7 +194,7 @@ const AdminPage: React.FC<AdminPageProps> = ({
                 {skills.map(skill => (
                     <Card key={skill.id} className="relative p-4 text-center group" glowColor="blue">
                         <span>{skill.name}</span>
-                        <button onClick={() => onDeleteSkill(skill.id)} className="absolute top-1 right-1 p-1 text-red-500 bg-[#111827] rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => setSkillToDelete(skill)} className="absolute top-1 right-1 p-1 text-red-500 bg-[#111827] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" aria-label={`حذف مهارة: ${skill.name}`}>
                             <TrashIcon className="w-4 h-4" />
                         </button>
                     </Card>
@@ -212,13 +225,46 @@ const AdminPage: React.FC<AdminPageProps> = ({
                             <h4 className="font-bold text-purple-300">{fb.teacherName}</h4>
                             <p className="text-sm text-gray-400 italic">"{fb.comment}"</p>
                         </div>
-                        <button onClick={() => onDeleteTeacherFeedback(fb.id)} className="p-2 text-red-500 hover:text-red-400 flex-shrink-0">
+                        <button onClick={() => onDeleteTeacherFeedback(fb.id)} className="p-2 text-red-500 hover:text-red-400 flex-shrink-0" aria-label={`حذف تعليق المعلم: ${fb.teacherName}`}>
                             <TrashIcon />
                         </button>
                     </Card>
                 )) : ( <p className="text-center text-gray-500">لا توجد تعليقات للمراجعة حالياً.</p> )}
             </div>
         </section>
+
+        {/* Delete Confirmation Modal */}
+        {skillToDelete && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[110]" onClick={() => setSkillToDelete(null)} role="dialog" aria-modal="true" aria-labelledby="delete-skill-modal-title">
+                <div className="relative w-full max-w-sm p-4" onClick={(e) => e.stopPropagation()}>
+                    <Card glowColor="red" className="border-red-500/50">
+                        <div className="text-center">
+                            <h3 id="delete-skill-modal-title" className="text-2xl font-bold mb-4 text-red-400">تأكيد الحذف</h3>
+                            <p className="text-gray-300 mb-8 font-medium">
+                                هل أنت متأكد من رغبتك في حذف مهارة <span className="text-blue-400 font-bold">"{skillToDelete.name}"</span>؟ لا يمكن التراجع عن هذا الإجراء.
+                            </p>
+                            <div className="flex justify-center gap-4">
+                                <button 
+                                    onClick={async () => {
+                                        await onDeleteSkill(skillToDelete.id);
+                                        setSkillToDelete(null);
+                                    }}
+                                    className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2 rounded-md transition-all duration-300 shadow-lg shadow-red-500/30"
+                                >
+                                    حذف المهارة
+                                </button>
+                                <button 
+                                    onClick={() => setSkillToDelete(null)}
+                                    className="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+                                >
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+        )}
       </div>
     </div>
   );

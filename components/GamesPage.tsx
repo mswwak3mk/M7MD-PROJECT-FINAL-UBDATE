@@ -28,8 +28,12 @@ const GamesPage: React.FC<GamesPageProps> = ({ onBack }) => {
   return (
     <div className="relative z-10 p-4 md:p-8 max-w-6xl mx-auto">
         <header className="relative text-center py-10">
-            <button onClick={onBack} className="absolute top-1/2 -translate-y-1/2 left-0 md:left-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
-                <ChevronLeftIcon className="w-6 h-6" />
+            <button 
+                onClick={onBack} 
+                className="absolute top-1/2 -translate-y-1/2 left-0 md:left-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+                aria-label="العودة لصفحة الملف الشخصي"
+            >
+                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
                 <span className="font-bold">العودة للملف</span>
             </button>
             <SectionTitle icon={<GamepadIcon className="w-10 h-10"/>} title="صالة الألعاب" />

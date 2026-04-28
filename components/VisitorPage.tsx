@@ -44,10 +44,9 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback, o
   return (
     <main className="relative z-10 p-4 md:p-8 max-w-5xl mx-auto">
         
-        {/* Hero Section */}
-        <header id="hero-section" className="text-center py-20">
+        <header id="hero-section" className="text-center py-20" role="banner">
             <div className="inline-block p-4 border-2 border-purple-500 rounded-full shadow-lg shadow-purple-500/50 mb-6">
-                <img src={profile.imageUrl} alt="الصورة الشخصية" className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover" />
+                <img src={profile.imageUrl} alt={`الصورة الشخصية للطالب ${profile.name}`} className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 مرحباً بكم في ملف إنجازي! <span className="text-green-400">🎮✨</span>
@@ -96,11 +95,11 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback, o
                     {achievements.map((ach) => (
                         <Card key={ach.id} glowColor="green">
                             <div className="flex items-start gap-4">
-                                <div className="text-green-400 mt-1 drop-shadow-[0_0_5px_rgba(74,222,128,0.7)]"><CircuitBoardIcon className="w-6 h-6"/></div>
+                                <div className="text-green-400 mt-1 drop-shadow-[0_0_5px_rgba(74,222,128,0.7)]" aria-hidden="true"><CircuitBoardIcon className="w-6 h-6"/></div>
                                 <div className="flex-1">
                                     <h3 className="text-xl font-bold text-green-400 mb-2">{ach.title}</h3>
                                     <p className="text-gray-300">{ach.description}</p>
-                                    {ach.proofUrl && <img src={ach.proofUrl} alt={ach.title} className="mt-4 rounded-lg w-full h-40 object-cover" />}
+                                    {ach.proofUrl && <img src={ach.proofUrl} alt={`صورة إثبات لإنجاز: ${ach.title}`} className="mt-4 rounded-lg w-full h-40 object-cover" />}
                                 </div>
                             </div>
                         </Card>
@@ -148,9 +147,10 @@ const VisitorPage: React.FC<VisitorPageProps> = ({ data, onAddTeacherFeedback, o
             </div>
 
             {/* Teacher Feedback Section */}
-            <section>
-                <SectionTitle icon={<TeacherIcon className="w-8 h-8"/>} title="آراء وتعليقات المعلمين" />
-                <div className="space-y-6">
+            <section aria-labelledby="feedback-title">
+                <SectionTitle icon={<TeacherIcon className="w-8 h-8" aria-hidden="true"/>} title="آراء وتعليقات المعلمين" />
+                <div id="feedback-title" className="sr-only">آراء وتعليقات المعلمين</div>
+                <div className="space-y-6" aria-live="polite">
                     {teacherFeedback.length > 0 ? teacherFeedback.map((feedback) => (
                         <Card key={feedback.id} glowColor="purple">
                             <div className="flex items-start gap-4">
