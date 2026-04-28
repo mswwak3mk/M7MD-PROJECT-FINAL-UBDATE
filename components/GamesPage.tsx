@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import Card from './Card';
 import { GamepadIcon, ChevronLeftIcon } from './icons';
-import SnakeGame from './SnakeGame';
-import HangmanGame from './HangmanGame';
-import TicTacToeGame from './TicTacToeGame';
-import RockPaperScissorsGame from './RockPaperScissorsGame';
-import ReactionTimeGame from './ReactionTimeGame';
-import ClickerGame from './ClickerGame';
-import SudokuGame from './SudokuGame';
-import NeonButton from './Button';
+
+// Lazy loading game components for better performance
+const SnakeGame = lazy(() => import('./SnakeGame'));
+const HangmanGame = lazy(() => import('./HangmanGame'));
+const TicTacToeGame = lazy(() => import('./TicTacToeGame'));
+const RockPaperScissorsGame = lazy(() => import('./RockPaperScissorsGame'));
+const ReactionTimeGame = lazy(() => import('./ReactionTimeGame'));
+const ClickerGame = lazy(() => import('./ClickerGame'));
+const SudokuGame = lazy(() => import('./SudokuGame'));
 
 interface GamesPageProps {
   onBack: () => void;
@@ -23,6 +24,12 @@ const SectionTitle: React.FC<{ icon: React.ReactNode; title: string }> = ({ icon
     </div>
 );
 
+const GameLoadingFallback: React.FC = () => (
+    <div className="w-full h-64 flex flex-col items-center justify-center space-y-4 animate-pulse">
+        <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+        <p className="text-cyan-400 font-bold tracking-widest text-sm">LOADING COMPONENT...</p>
+    </div>
+);
 
 const GamesPage: React.FC<GamesPageProps> = ({ onBack }) => {
   return (
@@ -43,13 +50,41 @@ const GamesPage: React.FC<GamesPageProps> = ({ onBack }) => {
         </header>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card glowColor="purple"><SnakeGame /></Card>
-            <Card glowColor="green"><HangmanGame /></Card>
-            <Card glowColor="blue"><TicTacToeGame /></Card>
-            <Card glowColor="purple"><RockPaperScissorsGame /></Card>
-            <Card glowColor="green"><ReactionTimeGame /></Card>
-            <Card glowColor="blue"><ClickerGame /></Card>
-            <Card glowColor="purple" className="md:col-span-2 lg:col-span-3"><SudokuGame /></Card>
+            <Card glowColor="purple">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <SnakeGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="green">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <HangmanGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="blue">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <TicTacToeGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="purple">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <RockPaperScissorsGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="green">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <ReactionTimeGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="blue">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <ClickerGame />
+                </Suspense>
+            </Card>
+            <Card glowColor="purple" className="md:col-span-2 lg:col-span-3">
+                <Suspense fallback={<GameLoadingFallback />}>
+                    <SudokuGame />
+                </Suspense>
+            </Card>
         </div>
     </div>
   );

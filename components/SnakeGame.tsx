@@ -5,7 +5,6 @@ const CANVAS_SIZE = [400, 400];
 const SNAKE_START = [[8, 7], [8, 8]];
 const FOOD_START = [8, 3];
 const SCALE = 20;
-const SPEED = 150;
 
 const UP = [0, -1];
 const DOWN = [0, 1];
@@ -23,6 +22,12 @@ const DIRECTIONS: { [key: string]: number[] } = {
   d: RIGHT,
 };
 
+const DIFFICULTIES = {
+    easy: { speed: 200, label: 'سهل' },
+    medium: { speed: 150, label: 'متوسط' },
+    hard: { speed: 100, label: 'صعب' }
+};
+
 const SnakeGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +35,8 @@ const SnakeGame: React.FC = () => {
     const [snake, setSnake] = useState(SNAKE_START);
     const [food, setFood] = useState(FOOD_START);
     const [direction, setDirection] = useState([0, -1]);
-    const [speed, setSpeed] = useState<number | null>(SPEED);
+    const [difficulty, setDifficulty] = useState<keyof typeof DIFFICULTIES>('medium');
+    const [speed, setSpeed] = useState<number | null>(null);
     const [gameOver, setGameOver] = useState(false);
     const [score, setScore] = useState(0);
 
@@ -38,11 +44,11 @@ const SnakeGame: React.FC = () => {
         setSnake(SNAKE_START);
         setFood(FOOD_START);
         setDirection([0, -1]);
-        setSpeed(SPEED);
+        setSpeed(DIFFICULTIES[difficulty].speed);
         setGameOver(false);
         setScore(0);
         containerRef.current?.focus();
-    }, []);
+    }, [difficulty]);
 
     const createFood = (currentSnake: number[][]) => {
         let newFood: number[];
@@ -163,6 +169,29 @@ const SnakeGame: React.FC = () => {
                     height={`${CANVAS_SIZE[1]}px`}
                     className="bg-black/50 border-2 border-purple-500 rounded-md"
                  />
+                 {speed === null && !gameOver && (
+                     <div className="absolute inset-0 bg-black/80 flex flex-col justify-center items-center rounded-md p-6">
+                        <h4 className="text-2xl font-bold text-cyan-400 mb-6">اختر الصعوبة</h4>
+                        <div className="flex gap-4 mb-8">
+                            {(Object.keys(DIFFICULTIES) as Array<keyof typeof DIFFICULTIES>).map((level) => (
+                                <button
+                                    key={level}
+                                    onClick={() => setDifficulty(level)}
+                                    className={`px-4 py-2 rounded-md font-bold transition-all ${
+                                        difficulty === level 
+                                        ? 'bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]' 
+                                        : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+                                    }`}
+                                >
+                                    {DIFFICULTIES[level].label}
+                                </button>
+                            ))}
+                        </div>
+                        <NeonButton onClick={startGame} glowColor="purple">
+                            بدء اللعبة
+                        </NeonButton>
+                     </div>
+                 )}
                  {gameOver && (
                      <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center rounded-md">
                          <p className="text-4xl font-bold text-red-500 mb-4">انتهت اللعبة!</p>

@@ -6,6 +6,8 @@ type Player = 'X' | 'O' | null;
 const TicTacToeGame: React.FC = () => {
     const [board, setBoard] = useState<Player[]>(Array(9).fill(null));
     const [isXNext, setIsXNext] = useState(true);
+    const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+    const [gameStarted, setGameStarted] = useState(false);
 
     const calculateWinner = (squares: Player[]): Player => {
         const lines = [
@@ -28,50 +30,61 @@ const TicTacToeGame: React.FC = () => {
     const computerMove = useCallback(() => {
         if (winner || isBoardFull) return;
         
-        // Minimax Algorithm for unbeatable AI
-        const minimax = (tempBoard: Player[], depth: number, isMaximizing: boolean): number => {
-            const currentWinner = calculateWinner(tempBoard);
-            if (currentWinner === 'O') return 10 - depth;
-            if (currentWinner === 'X') return depth - 10;
-            if (tempBoard.every(square => square !== null)) return 0;
-
-            if (isMaximizing) {
-                let bestScore = -Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (tempBoard[i] === null) {
-                        tempBoard[i] = 'O';
-                        const score = minimax(tempBoard, depth + 1, false);
-                        tempBoard[i] = null;
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (tempBoard[i] === null) {
-                        tempBoard[i] = 'X';
-                        const score = minimax(tempBoard, depth + 1, true);
-                        tempBoard[i] = null;
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-                return bestScore;
-            }
-        };
-
-        let bestScore = -Infinity;
+        const availableMoves = board.map((val, idx) => val === null ? idx : null).filter((val): val is number => val !== null);
+        
         let move = -1;
-        const currentBoard = [...board];
 
-        for (let i = 0; i < 9; i++) {
-            if (currentBoard[i] === null) {
-                currentBoard[i] = 'O';
-                const score = minimax(currentBoard, 0, false);
-                currentBoard[i] = null;
-                if (score > bestScore) {
-                    bestScore = score;
-                    move = i;
+        if (difficulty === 'easy') {
+            // Completely random
+            move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        } else if (difficulty === 'medium' && Math.random() < 0.3) {
+            // 30% chance to make a random move on medium
+            move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        } else {
+            // Minimax Algorithm for hard/unbeatable AI
+            const minimax = (tempBoard: Player[], depth: number, isMaximizing: boolean): number => {
+                const currentWinner = calculateWinner(tempBoard);
+                if (currentWinner === 'O') return 10 - depth;
+                if (currentWinner === 'X') return depth - 10;
+                if (tempBoard.every(square => square !== null)) return 0;
+
+                if (isMaximizing) {
+                    let bestScore = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (tempBoard[i] === null) {
+                            tempBoard[i] = 'O';
+                            const score = minimax(tempBoard, depth + 1, false);
+                            tempBoard[i] = null;
+                            bestScore = Math.max(score, bestScore);
+                        }
+                    }
+                    return bestScore;
+                } else {
+                    let bestScore = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (tempBoard[i] === null) {
+                            tempBoard[i] = 'X';
+                            const score = minimax(tempBoard, depth + 1, true);
+                            tempBoard[i] = null;
+                            bestScore = Math.min(score, bestScore);
+                        }
+                    }
+                    return bestScore;
+                }
+            };
+
+            let bestScore = -Infinity;
+            const currentBoard = [...board];
+
+            for (let i = 0; i < 9; i++) {
+                if (currentBoard[i] === null) {
+                    currentBoard[i] = 'O';
+                    const score = minimax(currentBoard, 0, false);
+                    currentBoard[i] = null;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        move = i;
+                    }
                 }
             }
         }
@@ -82,7 +95,7 @@ const TicTacToeGame: React.FC = () => {
             setBoard(newBoard);
             setIsXNext(true);
         }
-    }, [board, winner, isBoardFull]);
+    }, [board, winner, isBoardFull, difficulty]);
 
 
     useEffect(() => {
@@ -106,6 +119,7 @@ const TicTacToeGame: React.FC = () => {
     const resetGame = () => {
         setBoard(Array(9).fill(null));
         setIsXNext(true);
+        setGameStarted(false);
     };
 
     const renderSquare = (i: number) => {
@@ -134,15 +148,45 @@ const TicTacToeGame: React.FC = () => {
     return (
         <div className="text-center p-4 flex flex-col items-center">
             <h3 className="text-xl font-bold text-purple-300 mb-4">لعبة إكس-أو</h3>
-            <p className="mb-4 text-lg text-gray-300">{status}</p>
-            <div className="grid grid-cols-3 gap-2 mb-4">
-                {Array(9).fill(null).map((_, i) => (
-                    <React.Fragment key={i}>
-                        {renderSquare(i)}
-                    </React.Fragment>
-                ))}
-            </div>
-            {(winner || isBoardFull) && <NeonButton onClick={resetGame} glowColor="purple">لعبة جديدة</NeonButton>}
+            
+            {!gameStarted ? (
+                <div className="bg-black/40 p-6 rounded-lg border border-purple-500/30">
+                    <h4 className="text-lg font-bold text-cyan-400 mb-4">اختر مستوى الصعوبة</h4>
+                    <div className="flex gap-4 mb-6">
+                        <button 
+                            onClick={() => setDifficulty('easy')}
+                            className={`px-4 py-2 rounded-md transition-all ${difficulty === 'easy' ? 'bg-cyan-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                        >
+                            سهل
+                        </button>
+                        <button 
+                            onClick={() => setDifficulty('medium')}
+                            className={`px-4 py-2 rounded-md transition-all ${difficulty === 'medium' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                        >
+                            متوسط
+                        </button>
+                        <button 
+                            onClick={() => setDifficulty('hard')}
+                            className={`px-4 py-2 rounded-md transition-all ${difficulty === 'hard' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                        >
+                            صعب
+                        </button>
+                    </div>
+                    <NeonButton onClick={() => setGameStarted(true)} glowColor="purple">بدء اللعب</NeonButton>
+                </div>
+            ) : (
+                <>
+                    <p className="mb-4 text-lg text-gray-300">{status}</p>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                        {Array(9).fill(null).map((_, i) => (
+                            <React.Fragment key={i}>
+                                {renderSquare(i)}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                    {(winner || isBoardFull) && <NeonButton onClick={resetGame} glowColor="purple">لعبة جديدة</NeonButton>}
+                </>
+            )}
         </div>
     );
 };
