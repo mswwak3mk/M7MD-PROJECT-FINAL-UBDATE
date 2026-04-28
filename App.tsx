@@ -79,8 +79,8 @@ const App: React.FC = () => {
             img.src = event.target?.result as string;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800; // Resize to max 800px
-                const MAX_HEIGHT = 800;
+                const MAX_WIDTH = 512; // Reduced from 800px for better Firestore performance
+                const MAX_HEIGHT = 512;
                 let width = img.width;
                 let height = img.height;
 
@@ -101,8 +101,8 @@ const App: React.FC = () => {
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
                     ctx.drawImage(img, 0, 0, width, height);
-                    // Convert to JPEG with 0.7 quality to save space
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    // Convert to JPEG with 0.6 quality to save significant space
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                     resolve(dataUrl);
                 } else {
                     reject(new Error("Could not get canvas context"));
@@ -208,6 +208,12 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUpdateSkill = async (updatedSkill: Skill) => {
+    if (!data) return;
+    const updatedSkills = data.skills.map(s => s.id === updatedSkill.id ? updatedSkill : s);
+    await portfolioDocRef.update({ skills: updatedSkills });
+  };
+
   const handleUpdateNotes = async (notes: string) => {
     await portfolioDocRef.update({ personalNotes: notes });
   };
@@ -268,6 +274,7 @@ const App: React.FC = () => {
             onDeleteAchievement={handleDeleteAchievement}
             onAddSkill={handleAddSkill}
             onDeleteSkill={handleDeleteSkill}
+            onUpdateSkill={handleUpdateSkill}
             onUpdateNotes={handleUpdateNotes}
             onDeleteTeacherFeedback={handleDeleteTeacherFeedback}
         />

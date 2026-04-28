@@ -23,7 +23,7 @@ const AdminLoginModal: React.FC<AdminLoginModalProps> = ({ onLogin, onClose }) =
             <h2 id="login-modal-title" className="text-3xl font-bold text-center mb-2 text-gray-100">دخول المشرف</h2>
             <p className="text-center text-gray-400 mb-8">الرجاء إدخال رمز الدخول للمتابعة.</p>
             <div className="mb-8 relative p-[2px] rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 shadow-lg shadow-cyan-500/30">
-              <label htmlFor="admin-password" class="sr-only">رمز الدخول</label>
+              <label htmlFor="admin-password" className="sr-only">رمز الدخول</label>
               <input
                 id="admin-password"
                 type="password"
